@@ -41,4 +41,59 @@ Eagles Eye works in three layers:
 
 ## 🏗 Architecture
 
-Farmer app (PWA
+Farmer app (PWA) → FastAPI on Cloud Run → Gemini API → Firestore → Dashboard (Google Maps heat map)
+
+## 📁 Repository Structure
+
+```
+eagles-eye/
+├── frontend/    # Farmer app (PWA)
+├── dashboard/   # Extension officer heat map
+├── backend/     # FastAPI + Gemini integration
+├── data/        # Seed script and sample photos
+└── docs/        # Brief, data contract, designs, pitch
+```
+
+## 🚀 Run Locally
+
+1. Clone the repo:
+   ```
+   git clone https://github.com/<your-username>/eagles-eye.git
+   cd eagles-eye
+   ```
+2. Copy `.env.example` to `.env` and add your own keys. **Never commit `.env`.**
+3. Backend:
+   ```
+   cd backend
+   pip install -r requirements.txt
+   uvicorn main:app --reload
+   ```
+4. Frontend and dashboard: see the README inside each folder.
+
+## 🔗 Live Demo
+
+- Farmer app: _link_
+- Dashboard: _link_
+- Demo video: _link_
+- Pitch slides: _link_
+
+## 🗺 Roadmap
+
+- Luganda and other local languages
+- SMS/USSD for farmers with feature phones
+- Partnerships with extension services and agro-dealers
+- Access to credit and fair markets
+
+## ⚠️ Limitations
+
+Eagles Eye is an **advisory tool** and does not replace an extension officer. The demo heat map uses **seeded sample data**; real scans would replace it in production.
+
+## 👥 Team Ugandan Eagles
+
+| Member | Role |
+|---|---|
+| Stephen Wasswa | Coordinator, product, UX |
+| Lyazi Patrick | AI and security |
+| Atulinda Derek Solomon | Backend |
+| Deborah Nzopi | Farmer app and testing |
+| Twahirwa Odriann | Dashboard |
