@@ -1,99 +1,147 @@
 # 🦅 Eagles Eye
 
-**An AI crop doctor for Ugandan smallholder farmers.**
-Snap a photo of a sick crop, get a diagnosis and treatment advice by voice, and feed an early-warning outbreak map for extension officers and NGOs.
-
-Built by **Team Ugandan Eagles** for the **Pre-DevFest Hackathon Kampala 2026** (SDG theme).
+> **AI-Powered Crop Doctor & Outbreak Early-Warning System for Ugandan Smallholder Farmers**  
+> Built by **Team Ugandan Eagles** for the **Pre-DevFest Hackathon Kampala 2026** (SDG Theme: Zero Hunger & Climate Action).
 
 ---
 
-## 🌍 The Problem
+## 🌍 Overview
 
-Ugandan smallholder farmers lose an estimated **35-40% of their crops** to pests and diseases such as banana bacterial wilt, coffee wilt, cassava mosaic and fall armyworm. Extension officers are too few and too far away, so farmers often act too late or guess the treatment.
+Smallholder farmers across Uganda lose an estimated **35–40% of their crop yields** to devastating diseases and pests (such as Banana Bacterial Wilt, Cassava Mosaic Disease, Coffee Leaf Rust, and Fall Armyworm). With agricultural extension officers spread thin across districts, farmers frequently diagnose issues too late or apply incorrect treatments.
 
-*Source: Watetezi report on challenges faced by smallholder farmers in Uganda.*
+**Eagles Eye** solves this through a three-tier intervention:
+1. **Farmer Advisory Layer (Mobile Web / PWA):** Farmers snap a photo of an ailing crop and receive instant AI diagnosis with actionable treatment recommendations in English and voice-ready Luganda.
+2. **Community Outbreak Layer:** Diagnoses are geotagged (district-level) and logged anonymously to track disease prevalence.
+3. **Decision-Maker Surveillance Layer (Web Dashboard):** Agricultural extension officers, NGOs, and local cooperatives visualize live outbreaks on an interactive Google Maps heat map to deploy early interventions.
 
-## 💡 Our Solution
+---
 
-Eagles Eye works in three layers:
-
-1. **Farmer layer:** upload a photo, get a Gemini diagnosis with treatment steps, severity and voice advice.
-2. **Community layer:** every scan is saved anonymously, so nearby farmers can be warned of outbreaks.
-3. **Decision-maker layer:** a district heat map helps extension officers, NGOs and the Ministry spot outbreaks early.
-
-## 🎯 Sustainable Development Goals
-
-- **SDG 2:** Zero Hunger (primary)
-- **SDG 13:** Climate Action
-- **SDG 1:** No Poverty
-- **SDG 9:** Industry, Innovation and Infrastructure
-
-## 🛠 Google Tools and What Each One Does
-
-| Tool | Role in the product |
-|---|---|
-| **Gemini** | Reads the crop photo and returns the diagnosis as structured JSON |
-| **Firestore** | Stores anonymised scans that power alerts and the heat map |
-| **Firebase Hosting and Auth** | Deploys the app and handles anonymous sign-in |
-| **Google Maps** | Draws the outbreak heat map |
-| **Cloud Text-to-Speech** | Reads the advice aloud for low-literacy users |
-| **Cloud Run** | Hosts the Python API |
-
-## 🏗 Architecture
-
-Farmer app (PWA) → FastAPI on Cloud Run → Gemini API → Firestore → Dashboard (Google Maps heat map)
-
-## 📁 Repository Structure
+## 📁 Repository Structure & Team Ownership
 
 ```
 eagles-eye/
-├── frontend/    # Farmer app (PWA)
-├── dashboard/   # Extension officer heat map
-├── backend/     # FastAPI + Gemini integration
-├── data/        # Seed script and sample photos
-└── docs/        # Brief, data contract, designs, pitch
+├── docs/                      # Architectural specs, API schemas & guidelines
+│   ├── DATA_CONTRACT.md       # Agreed JSON data contract between services
+│   └── ai-contract.md         # AI prompt engineering & Gemini guidelines
+├── backend/                   # Python Flask API + Gemini + Firestore (Derek & Lyazi)
+│   ├── app.py                 # Barebones Flask server with CORS & stub routes
+│   ├── requirements.txt       # Python dependencies
+│   └── .env.example           # Environment variable template
+├── frontend/                  # Farmer-facing mobile web interface (Deborah)
+│   ├── index.html             # HTML5 starter interface referencing Figma wireframes
+│   └── mock_data.json         # Static mock diagnosis data matching the contract
+├── dashboard/                 # Outbreak surveillance & heat map dashboard (Odriann)
+│   ├── index.html             # Dashboard starter interface with Google Maps placeholder
+│   └── seed_data.json         # 3 mock outbreak records (Masaka, Mukono, Mbale)
+└── data/
+    └── sample_crops/          # Test imagery for crops (Banana, Coffee, Cassava, Maize)
 ```
 
-## 🚀 Run Locally
+### Team Roles & Ownership
 
-1. Clone the repo:
-   ```
-   git clone https://github.com/<your-username>/eagles-eye.git
-   cd eagles-eye
-   ```
-2. Copy `.env.example` to `.env` and add your own keys. **Never commit `.env`.**
-3. Backend:
-   ```
-   cd backend
-   pip install -r requirements.txt
-   uvicorn main:app --reload
-   ```
-4. Frontend and dashboard: see the README inside each folder.
+| Team Member | Role | Component Ownership |
+|---|---|---|
+| **Stephen Wasswa** | Project Coordinator & Product Lead | Architecture, repo governance, UX & pitch |
+| **Atulinda Derek Solomon** | Backend Engineer | `backend/` (Flask API, endpoints, Firestore integration) |
+| **Lyazi Patrick** | AI & Security Specialist | `backend/` (Gemini API prompt engineering, multimodal analysis) |
+| **Deborah Nzopi** | Frontend Developer | `frontend/` (Farmer PWA, Figma implementation, camera upload, audio) |
+| **Twahirwa Odriann** | Dashboard Developer | `dashboard/` (Surveillance dashboard, Google Maps heat map) |
 
-## 🔗 Live Demo
+---
 
-- Farmer app: _link_
-- Dashboard: _link_
-- Demo video: _link_
-- Pitch slides: _link_
+## 🚀 Local Setup & Quickstart
 
-## 🗺 Roadmap
+### Prerequisites
+- Python 3.10+
+- Modern Web Browser (Chrome, Firefox, Edge)
+- Git
 
-- Luganda and other local languages
-- SMS/USSD for farmers with feature phones
-- Partnerships with extension services and agro-dealers
-- Access to credit and fair markets
+### 1. Clone the Repository
+```bash
+git clone https://github.com/Wasswa-Phen/eagles-eye.git
+cd eagles-eye
+```
 
-## ⚠️ Limitations
+### 2. Backend Setup (`backend/`)
+```bash
+# Navigate to backend directory
+cd backend
 
-Eagles Eye is an **advisory tool** and does not replace an extension officer. The demo heat map uses **seeded sample data**; real scans would replace it in production.
+# Create and activate virtual environment
+python -m venv venv
 
-## 👥 Team Ugandan Eagles
+# Windows (PowerShell):
+.\venv\Scripts\Activate.ps1
+# Linux / macOS:
+source venv/bin/activate
 
-| Member | Role |
-|---|---|
-| Stephen Wasswa | Coordinator, product, UX |
-| Lyazi Patrick | AI and security |
-| Atulinda Derek Solomon | Backend |
-| Deborah Nzopi | Farmer app and testing |
-| Twahirwa Odriann | Dashboard |
+# Install required dependencies
+pip install -r requirements.txt
+
+# Create your local environment configuration
+copy .env.example .env     # Windows
+# or: cp .env.example .env # macOS/Linux
+
+# Run the Flask development server
+python app.py
+```
+The backend API will start at: `http://localhost:8080`
+- **Health check:** `http://localhost:8080/`
+- **Diagnostics stub:** `http://localhost:8080/diagnose` (POST)
+- **Scans query stub:** `http://localhost:8080/scans` (GET)
+
+### 3. Frontend Development (`frontend/`)
+- Open `frontend/index.html` in your browser, or serve it using a local static server:
+  ```bash
+  # Using Python http.server
+  cd frontend
+  python -m http.server 3000
+  ```
+- Access the farmer app at `http://localhost:3000`. It comes pre-linked with `mock_data.json` for unblocked UI development against Figma designs.
+
+### 4. Surveillance Dashboard (`dashboard/`)
+- Open `dashboard/index.html` in your browser, or serve it:
+  ```bash
+  cd dashboard
+  python -m http.server 3001
+  ```
+- Access the extension officer heat map at `http://localhost:3001`. It reads sample outbreak records from `seed_data.json`.
+
+---
+
+## 📜 Data Contract & Schema
+
+All components strictly adhere to the unified JSON schema documented in [docs/DATA_CONTRACT.md](docs/DATA_CONTRACT.md).
+
+Example response payload:
+```json
+{
+  "crop": "Cassava",
+  "condition": "Cassava Mosaic Disease (CMD)",
+  "confidence": 0.94,
+  "severity": "high",
+  "is_healthy": false,
+  "advice": "Uproot and destroy infected plants immediately to prevent spread via whiteflies. Use certified disease-free stem cuttings for next planting.",
+  "advice_luganda": "Simbula era oyokye ebirime ebirwadde mangu ddala okuziyiza okusaasaana kw'olukonvuba lwa whiteflies. Kozesa ebiti ebiramu ebyakakasibwa mu kusimba okuddako.",
+  "location": {
+    "district": "Mukono",
+    "latitude": 0.3549,
+    "longitude": 32.7523
+  },
+  "timestamp": "2026-10-26T14:30:00Z"
+}
+```
+
+---
+
+## 🛠 Google Technologies Used
+
+- **Google GenAI / Gemini 2.5/Flash:** Multimodal computer vision analysis of crop leaves and diagnostic synthesis.
+- **Google Cloud Firestore:** Scalable NoSQL persistence for anonymous scan metadata and geographic outbreak points.
+- **Google Maps JavaScript API:** Visualizing outbreak intensity layers and district clusters.
+- **Cloud Run:** Containerized deployment for the Python Flask backend.
+
+---
+
+## ⚠️ Advisory Disclaimer
+Eagles Eye is an assistive diagnostic advisory system designed to augment agricultural practices. It does not replace field visits by certified agricultural extension specialists.

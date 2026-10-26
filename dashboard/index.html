@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eagles Eye — Outbreak Surveillance Dashboard</title>
+  <style>
+    :root {
+      --primary: #0f766e;
+      --primary-dark: #115e59;
+      --bg: #f1f5f9;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --success: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    /* Top Navigation */
+    nav {
+      background: #0f172a;
+      color: #fff;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .badge-live {
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      border: 1px solid #059669;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    /* Main Container */
+    main {
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 0 16px;
+    }
+
+    /* Developer Note */
+    .dashboard-note {
+      background: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      padding: 14px 18px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      font-size: 0.875rem;
+      color: #1e40af;
+    }
+
+    /* KPI Cards */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .kpi-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .kpi-value {
+      font-size: 1.75rem;
+      font-weight: 800;
+      margin-top: 4px;
+      color: var(--text);
+    }
+
+    /* Layout Grid: Map + Table */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 900px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    /* Map Placeholder */
+    #map-container {
+      width: 100%;
+      height: 480px;
+      background: #e2e8f0;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      border: 2px dashed #94a3b8;
+    }
+
+    .map-placeholder-text {
+      text-align: center;
+      padding: 20px;
+      max-width: 400px;
+    }
+
+    /* Outbreak List / Table */
+    .outbreak-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 480px;
+      overflow-y: auto;
+    }
+
+    .outbreak-item {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      background: #fafafa;
+    }
+
+    .outbreak-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .district-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .severity-pill {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 10px;
+      text-transform: uppercase;
+    }
+
+    .severity-high {
+      background: #fee2e2;
+      color: var(--danger);
+    }
+
+    .severity-moderate {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    .btn-connect {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+
+    .btn-connect:hover {
+      background: var(--primary-dark);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- =========================================================================
+       TODO (Odriann):
+       1. Replace map placeholder with Google Maps JavaScript API:
+          <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=visualization"></script>
+       2. Initialize google.maps.Map centered on Uganda coordinates (1.3733, 32.2903)
+       3. Implement google.maps.visualization.HeatmapLayer using locations from `seed_data.json`
+       4. Connect live feed to `GET http://localhost:8080/scans`
+       5. Add district/crop filter buttons (Banana, Cassava, Coffee)
+       ========================================================================= -->
+
+  <nav>
+    <div class="brand">
+      <span style="font-size: 1.5rem;">🦅</span>
+      <h1>Eagles Eye — Outbreak Surveillance</h1>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <span class="badge-live">● LIVE FEED</span>
+      <button class="btn-connect" id="btn-fetch-backend">Sync Backend Scans</button>
+    </div>
+  </nav>
+
+  <main>
+    <div class="dashboard-note">
+      <strong>🗺️ District Heat Map Scaffold:</strong> Owned by <em>Twahirwa Odriann</em>.<br>
+      This dashboard visualizes crop outbreaks across Uganda districts using <a href="seed_data.json" target="_blank"><code>dashboard/seed_data.json</code></a> and connects to <code>GET /scans</code>.
+    </div>
+
+    <!-- KPI Metric Cards -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-title">Total Scans Monitored</div>
+        <div class="kpi-value" id="kpi-scans">3</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Active Hotspot Districts</div>
+        <div class="kpi-value" style="color: #b91c1c;" id="kpi-districts">3</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">High-Severity Alerts</div>
+        <div class="kpi-value" style="color: var(--danger);" id="kpi-high-severity">2</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Primary Crops Impacted</div>
+        <div class="kpi-value" style="font-size: 1.2rem; margin-top: 10px;">Matooke, Cassava, Coffee</div>
+      </div>
+    </div>
+
+    <!-- Main Content: Map & Outbreak Feed -->
+    <div class="dashboard-grid">
+      <!-- Google Maps Placeholder Container -->
+      <section class="card">
+        <div class="card-header">
+          <h2 class="card-title">🇺🇬 Uganda Regional Outbreak Heat Map</h2>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">Center: Kampala (0.3476° N, 32.5825° E)</span>
+        </div>
+        
+        <div id="map-container">
+          <div class="map-placeholder-text">
+            <span style="font-size: 3rem;">📍</span>
+            <h3 style="margin-top: 8px;">Google Maps Heatmap Container</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px;">
+              Ready for <code>google.maps.visualization.HeatmapLayer</code>.
+            </p>
+            <p style="font-size: 0.8rem; color: #475569; margin-top: 8px; background: #fff; padding: 8px; border-radius: 6px;">
+              Active seeded hotspots: <strong>Masaka</strong> (Banana Wilt), <strong>Mukono</strong> (Cassava CMD), <strong>Mbale</strong> (Coffee Rust).
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Recent Outbreaks Feed -->
+      <section class="card">
+        <div class="card-header">
+          <h2 class="card-title">🚨 Recent Alerts</h2>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">Seed Data</span>
+        </div>
+
+        <div class="outbreak-list" id="outbreak-list-container">
+          <!-- Populated from seed_data.json -->
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    // Load and render seed_data.json records into the feed
+    async function loadOutbreakFeed() {
+      try {
+        const res = await fetch('seed_data.json');
+        const records = await res.json();
+        const container = document.getElementById('outbreak-list-container');
+        container.innerHTML = '';
+
+        records.forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'outbreak-item';
+          const badgeClass = item.severity === 'high' ? 'severity-high' : 'severity-moderate';
+          card.innerHTML = `
+            <div class="outbreak-item-header">
+              <span class="district-name">📍 ${item.location.district} District</span>
+              <span class="severity-pill ${badgeClass}">${item.severity}</span>
+            </div>
+            <div style="font-size: 0.85rem; font-weight: 600; color: #1e293b;">${item.crop} — ${item.condition}</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">Confidence: ${Math.round(item.confidence * 100)}% • ${new Date(item.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+          `;
+          container.appendChild(card);
+        });
+      } catch (err) {
+        console.error('Failed to load seed_data.json:', err);
+      }
+    }
+
+    // Backend connectivity tester
+    document.getElementById('btn-fetch-backend').addEventListener('click', async () => {
+      try {
+        const res = await fetch('http://localhost:8080/scans');
+        const data = await res.json();
+        alert(`Successfully connected to Backend! Fetched ${data.count} scans.`);
+      } catch (err) {
+        alert('Could not reach backend at http://localhost:8080/scans. Please make sure `python app.py` is running.');
+      }
+    });
+
+    // Initialize on load
+    loadOutbreakFeed();
+  </script>
+</body>
+</html>
