@@ -31,7 +31,15 @@ load_dotenv(Path(__file__).resolve().parent / ".env")
 from db import delete_seeded_scans, save_scan, storage_mode  # noqa: E402
 from districts import get_location  # noqa: E402
 
-SEED_FILE = Path(__file__).resolve().parent.parent / "dashboard" / "seed_data.json"
+# The dashboard folder moved from dashboard/ to clients/dashboard/ during the
+# repo restructure, so we check both places and use whichever exists.
+REPO_ROOT = Path(__file__).resolve().parent.parent
+SEED_FILE = next(
+    (path for path in (REPO_ROOT / "clients" / "dashboard" / "seed_data.json",
+                       REPO_ROOT / "dashboard" / "seed_data.json")
+     if path.exists()),
+    REPO_ROOT / "clients" / "dashboard" / "seed_data.json",  # shown in the error if missing
+)
 
 # Districts where each crop is realistically grown (used to place extra records).
 CROP_DISTRICTS = {
